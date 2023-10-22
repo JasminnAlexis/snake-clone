@@ -18,4 +18,3 @@ Controls
 Arrow keys: Move the snake.
 
 Created by JasminnAlexis
-This project is licensed under the MIT License - see the LICENSE.md file for details.
