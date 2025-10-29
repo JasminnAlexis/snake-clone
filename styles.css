@@ -1,0 +1,248 @@
+/* =========================================================
+   Snake — Clean CSS (no D-pad overlap)
+   - square canvas on top
+   - overlays cover only the square
+   - D-pad sits BELOW the canvas (mobile only, while playing)
+   ========================================================= */
+
+/* ---------- Theme tokens ---------- */
+:root{
+  --green:        #4CAF50;
+  --green-dark:   #388E3C;
+  --sand:         #EDC9AF;
+  --sand-2:       #F5DABD;
+  --ink:          #0b0b0b;
+  --panel-radius: 10px;
+  --shadow:       0 0 15px rgba(0,0,0,.20);
+}
+
+/* ---------- Page ---------- */
+*{ box-sizing: border-box; }
+
+html, body{ height:100%; }
+
+body{
+  margin:0;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--ink);
+  overflow:hidden;                 /* no scroll while playing */
+  display:grid;
+  place-items:center;
+  min-height:100svh;
+
+  /* field look */
+  background-color: var(--green);
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 15px,
+      rgba(255,255,255,.20) 15px 30px
+    );
+}
+
+/* ---------- Game container stacks CANVAS + D-PAD ---------- */
+#gameContainer{
+  position: relative;
+  width: min(92vmin, 560px);
+  height: min(92vmin, 560px);
+  margin: 0 auto;
+  border-radius: var(--panel-radius);
+  box-shadow: var(--shadow);
+
+  /* NEW: grid-centering so the canvas sits in the middle */
+  display: grid;
+  place-items: center;
+}
+
+/* ---------- Square canvas ---------- */
+#snakeGameCanvas{
+  display: block;
+  border-radius: var(--panel-radius);
+  border: 1px solid #000;
+
+  /* visible playfield edge */
+  outline: 2px solid #ff3b3b;
+  outline-offset: -1px;
+
+  /* keep the sandy board */
+  background-color: var(--sand);
+  background-image:
+    repeating-radial-gradient(circle, var(--sand), var(--sand-2), var(--sand));
+}
+
+/* ---------- Overlays (cover the square only) ---------- */
+#titleScreen,
+#playerStatsScreen,
+#gameOverScreen{
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  /* Height should match the square canvas: use aspect-ratio container hack */
+  aspect-ratio: 1 / 1;
+  display: none;                   /* JS toggles display or .active */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: var(--panel-radius);
+  padding: 16px;
+  text-align: center;
+  z-index: 5;                      /* above canvas, below D-pad */
+}
+#titleScreen.active,
+#playerStatsScreen.active,
+#gameOverScreen.active{ display:flex; }
+
+/* Title look */
+#titleScreen h1{
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-size: 2rem;
+  color: var(--green);
+  text-shadow: 2px 2px 4px rgba(0,0,0,.5);
+}
+#titleScreen button{
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  padding: 10px 20px;
+  margin-top: 20px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--green);
+  color: var(--sand);
+  cursor: pointer;
+  transition: background-color .2s ease;
+}
+#titleScreen button:hover{ background: var(--green-dark); }
+
+/* Stats panel */
+#playerStatsScreen h2{
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-size: 2rem;
+  color: var(--green);
+  text-shadow: 2px 2px 4px rgba(0,0,0,.5);
+}
+#playerStatsScreen p{
+  font-weight: bold;
+  color: var(--black);
+  margin: 8px 0;
+}
+#playerStatsScreen button{
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  padding: 10px 20px;
+  margin-top: 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--green);
+  color: var(--sand);
+  cursor: pointer;
+  transition: background-color .2s ease;
+}
+#playerStatsScreen button:hover{ background: var(--green-dark); }
+
+#exitGameBtnContainer{ position:absolute; top:10px; left:10px; }
+#exitBtn{
+  font-size:14px;
+  padding:6px 10px;
+  border-radius:50%;
+  border:0;
+  background:var(--green);
+  color:var(--sand);
+  cursor:pointer;
+  transition: background-color .2s ease;
+}
+#exitBtn:hover{ background: var(--green-dark); }
+
+/* Notifications */
+.notification-hidden{ display:none; opacity:0; transition:opacity .3s ease; }
+.notification-shown{
+  display:block; opacity:1;
+  background:var(--green); color:#fff;
+  text-align:center; border-radius:6px; padding:10px 12px;
+  position:absolute; left:50%; top:12%; transform:translate(-50%,-50%);
+  font-size:1.1rem; z-index:6;
+}
+
+/* Game Over look */
+#gameOverScreen{
+  background: var(--sand);
+  background-image:
+    repeating-radial-gradient(circle, var(--sand), var(--sand-2), var(--sand));
+  box-shadow: inset 0 0 15px rgba(0,0,0,.20);
+}
+#gameOverScreen h1{
+  font-family:"Comic Sans MS", cursive, sans-serif;
+  font-size:2rem; color:var(--green);
+  text-shadow:2px 2px 4px rgba(0,0,0,.5);
+}
+#gameOverScreen p{
+  font-family:"Comic Sans MS", cursive, sans-serif;
+  font-size:1.25rem; color:var(--green);
+  text-shadow:1px 1px 3px rgba(0,0,0,.5);
+}
+#gameOverScreen button{
+  font-family:"Comic Sans MS", cursive, sans-serif;
+  padding:10px 20px; margin-top:16px;
+  border:0; border-radius:8px; background:var(--green); color:var(--sand);
+  cursor:pointer; transition:background-color .2s ease;
+}
+#gameOverScreen button:hover{ background:var(--green-dark); }
+
+/* ---------- D-pad BELOW the canvas ---------- */
+.dpad{
+  /* not absolute: sits under the canvas naturally */
+  display: none;                   /* shown only while playing on mobile */
+  grid-template-rows: auto auto auto;
+  gap: 8px;
+  justify-items: center;
+}
+.dpad .row{ display:grid; grid-auto-flow:column; gap:8px; }
+.dpad button{
+  width:72px; height:72px;
+  border-radius:12px;
+  border:1px solid rgba(0,0,0,.20);
+  background:#1a0f12;
+  color:#ffd2e6;
+  font-size:22px;
+  cursor:pointer;
+}
+
+/* show D-pad only while playing (JS toggles .playing on #gameContainer) */
+#gameContainer.playing .dpad{ display:grid; }
+
+/* hide D-pad on wider screens */
+@media (min-width: 840px){
+  #gameContainer.playing .dpad{ display:none; }
+}
+
+/* readable text when it sits under the canvas */
+#gameContainer { color: #0c2e08; }
+#gameContainer p, #gameContainer a, #gameContainer small { color: #0c2e08; }
+
+/* compact two-column D-pad layout */
+.dpad{ display:none; }                       /* default hidden, shown when .playing */
+#gameContainer.playing .dpad{ display:grid; }
+
+.dpad--twocol{
+  grid-template-columns: 1fr 1fr;            /* two columns */
+  gap: 10px 16px;
+  align-items: start;
+  justify-items: center;
+}
+
+/* smaller buttons */
+.dpad button{
+  width: 50px; height: 50px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,.2);
+  background: #1a0f12;
+  color: #d4ffd2;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* extra-compact on very small screens */
+@media (max-width: 420px){
+  .dpad button{ width: 48px; height: 48px; font-size: 18px; }
+}
+
+/* still hide D-pad on wider screens if you want keyboard-only there */
+@media (min-width: 840px){
+  #gameContainer.playing .dpad{ display:none; }
+}
