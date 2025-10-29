@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Snake Game</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Add class="game-container" so JS/CSS can target it -->
+  <div id="gameContainer" class="game-container">
+
+    <!-- Title overlay -->
+    <div id="titleScreen">
+      <h1>Snake</h1>
+      <button id="playButton" onclick="titlePlayBtn()">Play</button>
+    </div>
+
+    <!-- Player stats overlay -->
+    <div id="playerStatsScreen">
+      <div id="exitGameBtnContainer">
+        <button id="exitBtn" onclick="quitGame()">x</button>
+      </div>
+      <h2>Player Stats</h2>
+
+      <div id="notification" class="notification-hidden">
+        <span id="notificationText"></span>
+      </div>
+
+      <p>Highscore: <span id="playerHighScore" class="statValue"></span></p>
+      <p>Level: <span id="playerLevel" class="statValue"></span></p>
+      <p>XP: <span id="xpProgressBar" class="statValue"></span></p>
+
+      <p>Your Colors:
+        <span>
+          <select id="colorSelect"></select>
+        </span>
+      </p>
+
+      <button onclick="startCountdown()">Play</button>
+    </div>
+
+    <!-- Game over overlay -->
+    <div id="gameOverScreen" style="display:none; position:absolute; inset:0; background-color:rgba(0,0,0,0.8); text-align:center; color:#fff;">
+      <h1>Game Over!</h1>
+      <p id="highScore">High Score: 0</p>
+      <p id="finalScore">Your Score: 0</p>
+      <button onclick="restartGame()">Play Again</button>
+      <button onclick="quitGame()">Quit</button>
+    </div>
+
+    <!-- Canvas + mobile controls -->
+    <canvas id="snakeGameCanvas" width="400" height="400" tabindex="0" aria-label="Snake game canvas"></canvas>
+
+    <!-- D-pad lives OUTSIDE the canvas; appears only while playing -->
+    <div class="dpad dpad--twocol" aria-hidden="true">
+  <div class="col">
+    <button data-dir="LEFT"  aria-label="Left">◀</button>
+    <button data-dir="RIGHT" aria-label="Right">▶</button>
+  </div>
+  <div class="col">
+    <button data-dir="UP"    aria-label="Up">▲</button>
+    <button data-dir="DOWN"  aria-label="Down">▼</button>
+  </div>
+</div>
+
+  <script src="script.js"></script>
+</body>
+</html>
